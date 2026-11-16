@@ -4,6 +4,7 @@ import 'vue-sonner/style.css'
 const { title, description, image } = useAppConfig()
 const route = useRoute()
 const requestUrl = useRequestURL()
+const { previewMode } = useRuntimeConfig().public
 const localeHead = useLocaleHead()
 const colorMode = useColorMode()
 
@@ -24,6 +25,7 @@ useSeoMeta({
 useHead(() => ({
   htmlAttrs: localeHead.value.htmlAttrs,
   meta: [
+    ...(previewMode ? [{ name: 'robots', content: 'noindex, nofollow' }] : []),
     {
       name: 'viewport',
       content: 'width=device-width, initial-scale=1, viewport-fit=cover',

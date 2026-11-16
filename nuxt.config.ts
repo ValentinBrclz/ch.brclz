@@ -3,6 +3,10 @@ import process from 'node:process'
 import tailwindcss from '@tailwindcss/vite'
 import { currentLocales } from './i18n/i18n'
 
+// Preview deployments must never be indexed. Headers are baked into `_headers` at build time,
+// so NUXT_PUBLIC_PREVIEW_MODE must be set in the build environment too.
+const isPreview = process.env.NUXT_PUBLIC_PREVIEW_MODE === 'true'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
@@ -53,6 +57,7 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
+    ...(isPreview ? { '/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } } } : {}),
     '/dashboard': {
       redirect: '/dashboard/links',
     },

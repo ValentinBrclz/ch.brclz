@@ -71,14 +71,16 @@ Also bind `ANALYTICS`. Add `R2` for [backups](/features/backups), `AI` for [Work
 
 On Workers, set the same value in Builds and runtime. On Pages, set once, then redeploy.
 
-| Variable                          | Default | Purpose                                                                                            |
-| --------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| `NUXT_PUBLIC_PREVIEW_MODE`        | empty   | `true` = demo mode (links last 5 minutes)                                                          |
-| `NUXT_PUBLIC_SLUG_DEFAULT_LENGTH` | `6`     | Length of auto-generated short codes                                                               |
-| `NUXT_PUBLIC_KV_BATCH_LIMIT`      | `50`    | Export page size; import accepts at most half per request                                          |
-| `NUXT_PUBLIC_MAX_URL_LENGTH`      | `16384` | Maximum target URL length in characters (256-24000)                                                |
-| `NUXT_PUBLIC_HOME_URL`            | empty   | Non-empty URL redirects `/`; empty shows the Sink homepage                                         |
-| `NUXT_PUBLIC_LINK_PROXY_ENABLED`  | `false` | `true` allows links to opt into reverse proxy mode; off, stored proxy links fall back to redirects |
+| Variable                          | Default    | Purpose                                                                                            |
+| --------------------------------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| `NUXT_PUBLIC_PREVIEW_MODE`        | empty      | `true` = demo mode (links last 5 minutes)                                                          |
+| `NUXT_PUBLIC_SLUG_DEFAULT_LENGTH` | `6`        | Length of auto-generated short codes                                                               |
+| `NUXT_PUBLIC_KV_BATCH_LIMIT`      | `50`       | Export page size; import accepts at most half per request                                          |
+| `NUXT_PUBLIC_MAX_URL_LENGTH`      | `16384`    | Maximum target URL length in characters (256-24000)                                                |
+| `NUXT_PUBLIC_HOME_URL`            | empty      | Non-empty URL redirects `/`; empty shows the Sink homepage                                         |
+| `NUXT_PUBLIC_LINK_PROXY_ENABLED`  | `false`    | `true` allows links to opt into reverse proxy mode; off, stored proxy links fall back to redirects |
+| `NUXT_PUBLIC_DEFAULT_UTM_SOURCE`  | `brclz.ch` | `utm_source` added to new links when absent; empty disables                                        |
+| `NUXT_PUBLIC_DEFAULT_UTM_MEDIUM`  | `referral` | `utm_medium` added to new links when absent; empty disables                                        |
 
 `NUXT_PUBLIC_*` values are baked into the built UI and read at runtime, so changes need a rebuild before the client picks them up.
 

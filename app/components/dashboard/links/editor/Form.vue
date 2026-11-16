@@ -22,6 +22,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const linksSearchStore = useDashboardLinksSearchStore()
 const requestUrl = useRequestURL()
+const { defaultUtmSource, defaultUtmMedium } = useRuntimeConfig().public
 
 const slugValidator = SlugSchema
 const commentValidator = z.string().max(500).optional()
@@ -34,7 +35,12 @@ const form = useForm({
   defaultValues,
   onSubmit: async ({ value }) => {
     try {
-      const linkData = normalizeLinkFormSubmitPayload(value, props.isEdit)
+      const linkData = normalizeLinkFormSubmitPayload(
+        props.isEdit
+          ? value
+          : { ...value, url: applyDefaultUtm(value.url, { source: defaultUtmSource, medium: defaultUtmMedium }) },
+        props.isEdit,
+      )
       const { link: newLink } = await useAPI<{ link: DashboardLink }>(
         props.isEdit ? '/api/link/edit' : '/api/link/create',
         {

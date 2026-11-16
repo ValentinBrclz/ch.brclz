@@ -47,6 +47,9 @@ export default defineNuxtConfig({
       maxUrlLength: '16384',
       homeURL: process.env.NUXT_HOME_URL || '',
       linkProxyEnabled: false,
+      // Default UTM parameters appended when creating a link; set empty to disable.
+      defaultUtmSource: 'brclz.ch',
+      defaultUtmMedium: 'referral',
     },
   },
   routeRules: {

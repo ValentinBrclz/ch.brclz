@@ -73,7 +73,7 @@ On Workers, set the same value in Builds and runtime. On Pages, set once, then r
 
 | Variable                          | Default    | Purpose                                                                                            |
 | --------------------------------- | ---------- | -------------------------------------------------------------------------------------------------- |
-| `NUXT_PUBLIC_PREVIEW_MODE`        | empty      | `true` = demo mode (links last 5 minutes, `noindex, nofollow`)                                     |
+| `NUXT_PUBLIC_PREVIEW_MODE`        | empty      | `true` = demo mode (links last 5 minutes)                                                          |
 | `NUXT_PUBLIC_SLUG_DEFAULT_LENGTH` | `6`        | Length of auto-generated short codes                                                               |
 | `NUXT_PUBLIC_KV_BATCH_LIMIT`      | `50`       | Export page size; import accepts at most half per request                                          |
 | `NUXT_PUBLIC_MAX_URL_LENGTH`      | `16384`    | Maximum target URL length in characters (256-24000)                                                |
@@ -83,6 +83,8 @@ On Workers, set the same value in Builds and runtime. On Pages, set once, then r
 | `NUXT_PUBLIC_DEFAULT_UTM_MEDIUM`  | `referral` | `utm_medium` added to new links when absent; empty disables                                        |
 
 `NUXT_PUBLIC_*` values are baked into the built UI and read at runtime, so changes need a rebuild before the client picks them up.
+
+Builds on a non-production Cloudflare branch (`WORKERS_CI_BRANCH` or `CF_PAGES_BRANCH` other than `master`) emit `X-Robots-Tag: noindex, nofollow` and a robots meta tag. Set `NUXT_NOINDEX=true` or `false` at build time to force the behaviour.
 
 `NUXT_HOME_URL` is the deprecated name of `NUXT_PUBLIC_HOME_URL`. It still works, but rename it when you next change your settings.
 

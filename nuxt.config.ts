@@ -3,9 +3,14 @@ import process from 'node:process'
 import tailwindcss from '@tailwindcss/vite'
 import { currentLocales } from './i18n/i18n'
 
-// Preview deployments must never be indexed. Headers are baked into `_headers` at build time,
-// so NUXT_PUBLIC_PREVIEW_MODE must be set in the build environment too.
-const isPreview = process.env.NUXT_PUBLIC_PREVIEW_MODE === 'true'
+// Cloudflare preview deployments (any non-production branch build) must never be indexed.
+// Detected at build time from Workers Builds (WORKERS_CI_BRANCH) or Pages (CF_PAGES_BRANCH);
+// NUXT_NOINDEX=true/false forces the behaviour. Headers are baked into `_headers`.
+const PRODUCTION_BRANCH = 'master'
+const deployBranch = process.env.WORKERS_CI_BRANCH || process.env.CF_PAGES_BRANCH
+const noindex = process.env.NUXT_NOINDEX
+  ? process.env.NUXT_NOINDEX === 'true'
+  : Boolean(deployBranch) && deployBranch !== PRODUCTION_BRANCH
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -54,10 +59,11 @@ export default defineNuxtConfig({
       // Default UTM parameters appended when creating a link; set empty to disable.
       defaultUtmSource: 'brclz.ch',
       defaultUtmMedium: 'referral',
+      noindex,
     },
   },
   routeRules: {
-    ...(isPreview ? { '/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } } } : {}),
+    ...(noindex ? { '/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } } } : {}),
     '/dashboard': {
       redirect: '/dashboard/links',
     },

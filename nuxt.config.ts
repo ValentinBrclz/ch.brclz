@@ -3,6 +3,15 @@ import process from 'node:process'
 import tailwindcss from '@tailwindcss/vite'
 import { currentLocales } from './i18n/i18n'
 
+// Cloudflare preview deployments (any non-production branch build) must never be indexed.
+// Detected at build time from Workers Builds (WORKERS_CI_BRANCH) or Pages (CF_PAGES_BRANCH);
+// NUXT_NOINDEX=true/false forces the behaviour. Headers are baked into `_headers`.
+const PRODUCTION_BRANCH = 'master'
+const deployBranch = process.env.WORKERS_CI_BRANCH || process.env.CF_PAGES_BRANCH
+const noindex = process.env.NUXT_NOINDEX
+  ? process.env.NUXT_NOINDEX === 'true'
+  : Boolean(deployBranch) && deployBranch !== PRODUCTION_BRANCH
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
@@ -47,9 +56,14 @@ export default defineNuxtConfig({
       maxUrlLength: '16384',
       homeURL: process.env.NUXT_HOME_URL || '',
       linkProxyEnabled: false,
+      // Default UTM parameters appended when creating a link; set empty to disable.
+      defaultUtmSource: 'brclz.ch',
+      defaultUtmMedium: 'referral',
+      noindex,
     },
   },
   routeRules: {
+    ...(noindex ? { '/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } } } : {}),
     '/dashboard': {
       redirect: '/dashboard/links',
     },

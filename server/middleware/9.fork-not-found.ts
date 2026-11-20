@@ -1,18 +1,37 @@
 import { parsePath } from 'ufo'
+import appRoutePatterns from '#fork-app-routes'
 
 // Fork-only. `1.redirect.ts` already answers every slug-shaped path (redirect or 404), so
 // this middleware only sees the rest. Because the app is `ssr: false`, Nuxt would otherwise
-// serve the SPA shell with HTTP 200 for any such path (soft 404).
-const APP_OWNED_PREFIXES = ['/api', '/dashboard', '/_nuxt', '/_docs', '/_assets', '/__nuxt_error']
+// serve the SPA shell with HTTP 200 for any such path (soft 404). A path is served only if it is
+// a real page (list generated at build time by `modules/fork-app-routes.ts`) or a server route.
+const PAGE_PATTERNS = appRoutePatterns.map(pattern => new RegExp(`^${pattern}$`))
+const SERVER_PREFIXES = ['/api', '/_nuxt', '/_docs', '/_assets', '/__nuxt_error']
+
+function normalizePath(pathname: string): string | null {
+  try {
+    // Decoding first means `/dashboard/%2eenv` cannot slip past the checks below.
+    const decoded = decodeURI(pathname)
+    return decoded.length > 1 ? decoded.replace(/\/+$/, '') || '/' : decoded
+  }
+  catch {
+    return null
+  }
+}
 
 function isAppOwnedPath(pathname: string): boolean {
-  return pathname === '/' || APP_OWNED_PREFIXES.some(prefix => pathname === prefix || pathname.startsWith(`${prefix}/`))
+  const path = normalizePath(pathname)
+  if (path === null)
+    return false
+
+  // `/dashboard` itself is redirected to its first page by routeRules.
+  return path === '/dashboard'
+    || PAGE_PATTERNS.some(pattern => pattern.test(path))
+    || SERVER_PREFIXES.some(prefix => path === prefix || path.startsWith(`${prefix}/`))
 }
 
 export default eventHandler((event) => {
-  if (event.method !== 'GET' && event.method !== 'HEAD')
-    return
-
+  // Every method: link forms (POST) are answered earlier by 1.redirect.ts, and /api is app-owned.
   const { pathname } = parsePath(event.path)
   if (isAppOwnedPath(pathname))
     return

@@ -6,6 +6,11 @@ import { parsePath } from 'ufo'
 const APP_OWNED_PREFIXES = ['/api', '/dashboard', '/_nuxt', '/_docs', '/_assets', '/__nuxt_error']
 
 function isAppOwnedPath(pathname: string): boolean {
+  // Dashboard pages never contain a dot, so `/dashboard/.env` or `/dashboard/x.php` are probes, not routes.
+  // The rule is limited to /dashboard: `/_docs/openapi.json` and `/_assets/<key>.png` are real dotted routes.
+  if (pathname.startsWith('/dashboard/') && pathname.split('/').pop()!.includes('.'))
+    return false
+
   return pathname === '/' || APP_OWNED_PREFIXES.some(prefix => pathname === prefix || pathname.startsWith(`${prefix}/`))
 }
 

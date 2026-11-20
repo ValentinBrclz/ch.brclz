@@ -4,7 +4,7 @@ import { fetch } from './utils'
 const HTML = { Accept: 'text/html,application/xhtml+xml' }
 
 describe('fork 404 handling', () => {
-  it.each(['/credentials.json', '/a/b', '/_nuxt/missing.js', '/wp-login.php'])('answers %s with a plain 404', async (path) => {
+  it.each(['/credentials.json', '/a/b', '/_nuxt/missing.js', '/wp-login.php', '/dashboard/.env', '/dashboard/x/config.php'])('answers %s with a plain 404', async (path) => {
     const response = await fetch(path)
     expect(response.status).toBe(404)
     expect(response.headers.get('content-type')).toContain('text/plain')

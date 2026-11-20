@@ -4,11 +4,16 @@ import { fetch } from './utils'
 const HTML = { Accept: 'text/html,application/xhtml+xml' }
 
 describe('fork 404 handling', () => {
-  it.each(['/credentials.json', '/a/b', '/_nuxt/missing.js', '/wp-login.php', '/dashboard/.env', '/dashboard/x/config.php'])('answers %s with a plain 404', async (path) => {
+  it.each(['/credentials.json', '/a/b', '/_nuxt/missing.js', '/wp-login.php', '/dashboard/.env', '/dashboard/x/config.php', '/dashboard/admin', '/dashboard/%2eenv', '/dashboard/links/extra'])('answers %s with a plain 404', async (path) => {
     const response = await fetch(path)
     expect(response.status).toBe(404)
     expect(response.headers.get('content-type')).toContain('text/plain')
     expect(await response.text()).toBe('Not Found')
+  })
+
+  it('answers 404 for non-GET methods on unknown paths', async () => {
+    expect((await fetch('/credentials.json', { method: 'POST', body: '{}' })).status).toBe(404)
+    expect((await fetch('/dashboard/.env', { method: 'PUT', body: '{}' })).status).toBe(404)
   })
 
   it('serves the custom page for HTML requests on non-slug paths', async () => {
@@ -47,6 +52,8 @@ describe('fork 404 handling', () => {
 
   it('does not hijack app-owned paths', async () => {
     expect((await fetch('/api/verify')).status).toBe(401)
-    expect((await fetch('/dashboard/links', { headers: HTML })).status).not.toBe(404)
+    for (const page of ['/dashboard/links', '/dashboard/links/', '/dashboard/analysis', '/dashboard/realtime', '/dashboard/login'])
+      expect((await fetch(page, { headers: HTML })).status, page).toBe(200)
+    expect((await fetch('/_docs/openapi.json')).status).toBe(200)
   })
 })

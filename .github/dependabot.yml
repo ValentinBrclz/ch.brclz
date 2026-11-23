@@ -16,9 +16,6 @@ updates:
       prefix: build(deps)
       prefix-development: build(deps-dev)
     groups:
-      security:
-        applies-to: security-updates
-        patterns: ['*']
       cloudflare:
         patterns: [wrangler, '@cloudflare/*']
         update-types: [minor, patch]

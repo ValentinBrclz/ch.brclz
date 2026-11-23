@@ -1,17 +1,48 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# Grouped updates: one weekly PR per group for minor/patch, one PR per major.
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
 updates:
-  - package-ecosystem: 'npm' # See documentation for possible values
-    directory: '/' # Location of package manifests
+  - package-ecosystem: npm
+    directory: /
     schedule:
-      interval: 'weekly'
+      interval: weekly
+      day: monday
+      timezone: Europe/Zurich
     cooldown:
-      default-days: 5
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: build(deps)
+      prefix-development: build(deps-dev)
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ['*']
+      cloudflare:
+        patterns: [wrangler, '@cloudflare/*']
+        update-types: [minor, patch]
+      production:
+        dependency-type: production
+        update-types: [minor, patch]
+      development:
+        dependency-type: development
+        update-types: [minor, patch]
     ignore:
       # Keep the Node typings on the runtime's major (.node-version); bump both together.
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Zurich
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci(deps)
+    groups:
+      actions:
+        patterns: ['*']
+        update-types: [minor, patch]
